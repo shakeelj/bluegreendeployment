@@ -1,0 +1,81 @@
+** Jenkins project **
+
+Jenkins project do this:
+
+1. Fetch terraform project from git
+2. Create and provision instance (terraform)
+3. Create new image from running instance (awscli)
+
+** Terraform file **
+
+Terraform project is here: https://github.com/btower-labz/ami-build-poc
+
+Main file: test.tf
+Deploy script: test.sh
+
+Basically, the areas to check are:
+
+1. provider "aws"
+Provider definition. Change this acording to your environment.
+Make notice, you need to change zone info in the .aws/credentials also.
+
+2. resource "aws_key_pair" "builder"
+Key pair for deploy. It's /var/lib/jenkins/.ssh/jenkins_key.pub saved as value to tf
+
+3. resource "aws_security_group" "aws_sec"
+Change this according to optapp and optweb requirements.
+Also put your tags here.
+
+4. data "aws_ami" "optapp"
+Base image selection. Change filters to your image names.
+
+5. resource "aws_instance" "optapp"
+Put your tags here. They may be used for latter filtering and cleanup.
+
+6. provisioner "file"
+All provision blocks are used to configure new instance. The are run once on the instance creation.
+File provisioners used to copy files. Copy you wars and deploy scripts here.
+
+7. provisioner "remote-exec"
+Use this to execute scripts and commands. Deploy yout wars here.
+
+
+8. output "*"
+Outputs used to display filtered data later. At the moment optapp_ip and optapp_id
+
+** Jenkins preparation steps was made **
+
+1. install terraform
+
+# sudo su -
+# uname -a
+# wget https://releases.hashicorp.com/terraform/0.9.11/terraform_0.9.11_linux_amd64.zip
+# unzip terraform_0.9.11_linux_amd64.zip
+# mv ./terraform /usr/bin
+# logout
+$ terraform --version
+
+2. install uuid
+
+$ sudo yum install uuid
+
+3. install pip
+
+$ sudo su -
+# wget https://bootstrap.pypa.io/get-pip.py
+# python ./get-pip.py
+# pip --version
+
+4. install aws cli
+
+$ sudo su -
+# pip install awscli
+# logout
+$ aws --version
+aws-cli/1.11.123 Python/2.7.5 Linux/3.10.0-514.21.2.el7.x86_64 botocore/1.5.86
+
+5. create aws creds in the file /var/lib/jenkins/.aws/credentials
+
+6. put jenkins ssh key here /var/lib/jenkins/.ssh/jenkins_key
+
+7. put jenkins ssh public key here /var/lib/jenkins/.ssh/jenkins_key.pub
