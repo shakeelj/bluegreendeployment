@@ -1,0 +1,333 @@
+ource Code ManagementBuild TriggersBuild EnvironmentBuildPost-build Actions
+ 	Project name	
+ami_poc_001
+ 	Description	
+This project works like this:
+
+1. Get the tarraform script from repo
+2. Initialize terraform environment.
+3. Create and provision new ec2 instance
+4. Stop instance and create AMI image.
+
+[Plain text] Preview 	
+GitHub project	
+Throttle builds	Help for feature: Throttle builds
+Discard old builds	Help for feature: Discard old builds
+ 	Strategy		
+ 	Days to keep builds	
+7
+if not empty, build records are only kept up to this number of days	
+ 	Max # of builds to keep	
+3
+if not empty, only up to this number of build records are kept	
+ 
+Advanced...
+This project is parameterized	Help for feature: This project is parameterized
+Validating String Parameter
+[Help]
+ 	Name	
+tagname
+Help for feature: Name
+ 	Default Value	
+Help for feature: Default Value
+ 	Regular Expression	
+.+
+Help for feature: Regular Expression
+ 	Failed Validation Message	
+tagname parameter must be set
+Help for feature: Failed Validation Message
+ 	Description	
+scm tag to build
+[Plain text] Preview 	Help for feature: Description
+Delete
+Add Parameter
+Disable this project	Help for feature: Disable this project
+Execute concurrent builds if necessary	Help for feature: Execute concurrent builds if necessary
+ 
+Advanced...
+Source Code Management
+ None	
+ Git	
+ 	Repositories	
+ 	Repository URL	
+https://github.com/btower-labz/ami-build-poc
+Help for feature: Repository URL
+ 	Credentials	
+ 
+ Add
+ 
+Advanced...
+ 		
+Add Repository
+Help for feature: Repositories
+ 	Branches to build	
+ 	Branch Specifier (blank for 'any')	
+tags/${tagname}
+Help for feature: Branch Specifier (blank for 'any')
+ 		
+Delete Branch
+ 	Branch Specifier (blank for 'any')	
+*/master
+Help for feature: Branch Specifier (blank for 'any')
+ 		
+Add Branch
+Delete Branch
+ 	Repository browser		Help for feature: Repository browser
+ 	Additional Behaviours	
+Add
+ Subversion	Help for feature: Subversion
+Build Triggers
+Trigger builds remotely (e.g., from scripts)	Help for feature: Trigger builds remotely (e.g., from scripts)
+ 	Authentication Token	
+poc_key_001
+Use the following URL to trigger build remotely: JENKINS_URL/job/ami_poc_001/build?token=TOKEN_NAME or /buildWithParameters?token=TOKEN_NAME
+Optionally append &cause=Cause+Text to provide text that will be included in the recorded build cause.	
+Build after other projects are built	Help for feature: Build after other projects are built
+Build periodically	Help for feature: Build periodically
+GitHub hook trigger for GITScm polling	Help for feature: GitHub hook trigger for GITScm polling
+Poll SCM	Help for feature: Poll SCM
+ 	Schedule	
+H/15 * * * *
+Help for feature: Schedule
+Would last have run at Tuesday, July 25, 2017 2:45:15 PM EDT; would next run at Tuesday, July 25, 2017 3:00:15 PM EDT.
+ 	Ignore post-commit hooks		Help for feature: Ignore post-commit hooks
+Build Environment
+Delete workspace before build starts	
+Abort the build if it's stuck	
+Add timestamps to the Console Output	
+Use secret text(s) or file(s)	Help for feature: Use secret text(s) or file(s)
+Build
+Execute shell
+[Help]
+ 	Command	
+
+### This step initializes terraform environment and shown execution plan in the log.
+### No infrastructure modification is performed.
+ 
+set -o nounset
+set -o noclobber
+set -o errexit
+set -o pipefail
+ 
+rm -f ./build.id
+uuid -F SIV >./build.id
+BID=$(cat ./build.id)
+ 
+ 
+echo "Building image: ${BID}"
+echo "..."
+ 
+echo "Jenkins build ID: ${BUILD_ID}"
+echo "Jenkins build NUMBER: ${BUILD_NUMBER}"
+echo "Jenkins build DISPLAY: ${BUILD_DISPLAY_NAME}"
+echo "..."
+ 
+echo "Prepare configuration ..."
+terraform init
+terraform refresh
+terraform plan
+ 
+echo "Step finished ..."
+ 
+See the list of available environment variables	
+Delete
+Execute shell
+[Help]
+ 	Command	
+
+### This applies terraform script to actual infrastructure.
+### Actual creation of the new instance is done here.
+ 
+### This step also perform instance provisioning (deploy war)
+ 
+### Also, this creates file terraform.tfstate 
+### which is used to change and destroy terrraformmanaged infrustructure.
+ 
+set -o nounset
+set -o noclobber
+set -o errexit
+set -o pipefail
+ 
+BID=$(cat ./build.id)
+ 
+echo "Building image: ${BID}"
+echo "..."
+ 
+echo "Deploy infrastructure ..."
+ 
+terraform apply
+ 
+echo "Step finished ..."
+See the list of available environment variables	
+Delete
+Execute shell
+[Help]
+ 	Command	
+
+### This step shows the result in the log.
+### It demonstrates newly created instance id and ip
+### One can use it to test new instance.
+ 
+set -o nounset
+set -o noclobber
+set -o errexit
+set -o pipefail
+ 
+BID=$(cat ./build.id)
+ 
+echo "Building image: ${BID}"
+echo "..."
+ 
+echo "Demonstrate variables ..."
+ 
+terraform show
+terraform refresh
+terraform output
+ 
+echo "Show only instance id"
+terraform output optapp_id
+ 
+echo "Show only instance ip"
+terraform output optapp_ip
+ 
+echo "Step finished ..."
+ 
+See the list of available environment variables	
+Delete
+Execute shell
+[Help]
+ 	Command	
+
+### This step marks image for deletion in terraform.tfstate.
+### Accidental repeated run with the same state will recreate the instance.
+ 
+ 
+set -o nounset
+set -o noclobber
+set -o errexit
+set -o pipefail
+ 
+BID=$(cat ./build.id)
+ 
+echo "Building image: ${BID}"
+echo "..."
+ 
+echo "Mark instance for deletion ..."
+terraform taint aws_instance.optapp
+ 
+echo "Step finished ..."
+ 
+See the list of available environment variables	
+Delete
+Execute shell
+[Help]
+ 	Command	
+
+### This step stops newly created instance before the image creation.
+ 
+set -o nounset
+set -o noclobber
+set -o errexit
+set -o pipefail
+ 
+BID=$(cat ./build.id)
+ 
+echo "Building image: ${BID}"
+echo "..."
+ 
+IID=$(terraform output optapp_id)
+echo "Prepare instance for imaging: ${IID}"
+ 
+AWS_CONFIG_FILE=/var/lib/jenkins/.aws/credentials
+aws --profile staging ec2 stop-instances  --instance-ids "${IID}"
+aws --profile staging ec2 wait instance-stopped --instance-ids "${IID}"
+ 
+echo "Step finished ..."
+ 
+See the list of available environment variables	
+Delete
+Execute shell
+[Help]
+ 	Command	
+
+### This step builds new AMI image from the newly created instance.
+ 
+set -o nounset
+set -o noclobber
+set -o errexit
+set -o pipefail
+ 
+BID=$(cat ./build.id)
+ 
+echo "Building image: ${BID}"
+echo "..."
+ 
+IID=$(terraform output optapp_id)
+echo "AMI creation from the instance: ${IID}"
+ 
+rm -f ./ami.id
+ 
+AWS_CONFIG_FILE=/var/lib/jenkins/.aws/credentials
+aws --profile staging ec2 create-image --instance-id "${IID}" --name "opt_app_poc_${BID}" --query 'ImageId' >./ami.id
+ 
+echo "The image id is: $(cat ./ami.id)"
+ 
+echo "Step finished ..."
+ 
+See the list of available environment variables	
+Delete
+Execute shell
+[Help]
+ 	Command	
+
+### This step intended to destroy terraform managed infrastructure.
+### Though, each build run creates new instance in the cloud. So cleanup.
+ 
+set -o nounset
+set -o noclobber
+set -o errexit
+set -o pipefail
+ 
+BID=$(cat ./build.id)
+ 
+echo "Building image: ${BID}"
+echo "..."
+ 
+echo "Destroy infrastructure ..."
+terraform plan --destroy
+ 
+# terraform destroy --force
+ 
+echo "Step finished ..."
+ 
+See the list of available environment variables	
+Delete
+Execute shell
+[Help]
+ 	Command	
+
+### This step shows new image id.
+ 
+set -o nounset
+set -o noclobber
+set -o errexit
+set -o pipefail
+ 
+BID=$(cat ./build.id)
+ 
+echo "Building image: ${BID}"
+echo "..."
+ 
+echo "The new image is: $(cat ./ami.id)"
+ 
+See the list of available environment variables	
+Delete
+Execute shell
+[Help]
+ 	Command	
+
+env
+See the list of available environment variables	
+Delete
+Add build step
+Post-build Actions
