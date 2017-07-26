@@ -20,7 +20,7 @@ resource "aws_key_pair" "builder" {
   # Use our provider for the build
   provider = "aws.build"
   key_name   = "builder-key"
-  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDH4l0SJHhsm4IVQ8j0JeIy8XKfYaVpUj+VY0C1d8r9R/RAus20UrF2bBshiR9hWt3d8P411WtfHteKHSzhFM2E4I6+K4h0Ib1Rqf9rnXYr+J8UeI8JqvK7tJvPm3loAD9kc+y+q+Ow5oq1ukAJbR5wHHBWfyE+Rop2i4FT0Nf8IEtYn/TtKkd3SS1FBhOn4mfcnlyyq+24DbPrgHDf6KYwnxLLRBUVs/pV0A1EQ5H377RlC0c3Qm7C7LBLxh2sTV/Utud3ug8dIlujw/gV/g9INQdCl4uvxCZ0KIeBAk/aW+AJEfmBXj8aLFC64eF9+LvXqBT+5YCnG1Sej99sdE1Z jenkins@ip-172-31-16-30.ec2.internal"
+  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCxVf7zfPiLY9sg2Uork9/Km98a/YbLJ6Tcn8J/Mu1whkybnBCyUgvpqVResK9bg+wN24NMrDezCy53NNpBlTJUa4aUx7Xp/ZlxbMVtUnCfYeK2WT53yoCFMR3tW28d34QlGbHR79OAn+ZrTwvCrK6jIVYTv4jXkKwA8XdL/M2EUzwOTRvgixVmdHSH1iUQtXCF5N8a7TrmyvFP6XtveNYIqN7rTaX7E4+IFiAgfVkv9micD1gtHmIM4MVejNHU1yTYHMWE/r71tU1AO8a4M/9TlWS8q8dfgdwgQDhI0fJy41hSSFSUPSsRgjfHqU8PLFxqkWNN426ITziu0JBnVHYN ec2-user@ip-172-31-16-30.ec2.internal"
 }
 
 resource "aws_security_group" "aws_sec" {
