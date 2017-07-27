@@ -124,7 +124,7 @@ resource "aws_instance" "optapp" {
       type = "ssh"
       user = "ec2-user"
       # password = ""
-      private_key = "${file("/var/lib/jenkins/.ssh/jenkins_key")}"
+      private_key = "${file("/var/lib/jenkins/.ssh/id_rsa.pub")}"
       # agent = true
     }
   }
@@ -135,7 +135,7 @@ resource "aws_instance" "optapp" {
       type = "ssh"
       user = "ec2-user"
       # password = ""
-      private_key = "${file("/var/lib/jenkins/.ssh/jenkins_key")}"
+      private_key = "${file("/var/lib/jenkins/.ssh/id_rsa.pub")}"
       # agent = true
     }
     inline = [
@@ -154,7 +154,7 @@ resource "aws_instance" "optapp" {
       type = "ssh"
       user = "ec2-user"
       # password = ""
-      private_key = "${file("/var/lib/jenkins/.ssh/jenkins_key")}"
+      private_key = "${file("/var/lib/jenkins/.ssh/id_rsa.pub")}"
       # agent = true
     }
     script = "test.sh"
