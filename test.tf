@@ -84,7 +84,7 @@ data "aws_ami" "optapp" {
 # Describe resource
 resource "aws_instance" "optapp" {
 
-timouts{
+timouts {
 	create = 10
 }
 
