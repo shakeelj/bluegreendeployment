@@ -84,6 +84,10 @@ data "aws_ami" "optapp" {
 # Describe resource
 resource "aws_instance" "optapp" {
 
+timouts{
+	create = 10
+}
+
   # Use defined build environment
   provider = "aws.build"
 
