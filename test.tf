@@ -85,7 +85,7 @@ data "aws_ami" "optapp" {
 resource "aws_instance" "optapp" {
 
 timouts {
-	create = 10
+	create = 10m
 }
 
   # Use defined build environment
