@@ -84,9 +84,11 @@ data "aws_ami" "optapp" {
 # Describe resource
 resource "aws_instance" "optapp" {
 
-timouts {
-	create = 10m
-}
+  timeouts {
+	create = "15m"
+	update = "15m"
+	delete = "15m"
+  }
 
   # Use defined build environment
   provider = "aws.build"
