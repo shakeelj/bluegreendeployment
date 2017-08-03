@@ -20,7 +20,7 @@ resource "aws_key_pair" "builder" {
   # Use our provider for the build
   provider = "aws.build"
   key_name   = "builder-key"
-  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCnXKNmwJd9Avu1DAqCoJ+J6Oyz1y41qgElm+BJ/YrZk7Z7P3brbOsVlloPIyaJqK1yb/pEgFB0OadOv2TwXgf0fM4QMUuBTnUfJoNd+tRLkEr9bU5+XHNJ/pF3NdH26fFysWLkyWiBu5gtgalOyLNr8a+Si+c9Q6HgD9MV/NjfTmm64t8NeXtULFcypZ+GFIW6mRXJ9OrER4A81QsSMq8euMRgi4fnNvJzsdhTdz8BVbNf4Zgs6Ahuk0h1qzlrxLKMtqNo2+fEsDHboWJNkcFzCrJkMO/5XjoMsQ8mD8eZKow3Yuqy62kODmeFXeV5kMyiFHOhwvG3Hg7oRhadatWb jenkins@ip-10-168-1-133"
+  public_key = 
 }
 
 resource "aws_security_group" "aws_sec" {
